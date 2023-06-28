@@ -1,15 +1,39 @@
-version: '3'
+version: '3.7'
 services:
-  db:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  mysql-database:
+    image: mysql:latest
+    restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD='Isidro123$'
-      - MYSQL_DATABASE='db-isidro'
-      - MYSQL_USER='isidro'
-      - MYSQL_PASSWORD='Isidro123$'
-    ports:
-      - "3307:3306"
+      MYSQL_ROOT_PASSWORD: Isidro123$
+      MYSQL_USER: isidro
+      MYSQL_PASSWORD: Isidro123$
+      MYSQL_DATABASE: db-agro
     volumes:
-      - ./data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
+    ports:
+      - 3307:3306
+    networks:
+      - docker_network
+    container_name: mysql-db
+
+  node-red:
+    image: nodered/node-red:latest
+    restart: always
+    depends_on:
+      - mysql-database
+    environment:
+      - TZ=America/Sao_Paulo
+    ports:
+      - "1880:1880"
+    networks:
+      - docker_network
+    volumes:
+      - node_red_data:/data
+    container_name: node-red-env
+
+volumes:
+  node_red_data:  
+  mysql_data:
+
+networks:
+  docker_network:
